@@ -43,3 +43,6 @@ Docker image files are sometimes not persistent, so you should save your files t
 
 With this, you created your dataset and made inference upon it. Thanks for reading.
 
+EDIT: containers folder isn't being uploaded, probably because of git commands used by Dustin. For now, use 'git clone https://github.com/dusty-nv/jetson-containers.git -b bc8d0264ef25aa0d1d25a54e4658f491d2fa130f --single-branch'
+to fetch the 'containers' folder from the original repository (nothing was changed here).
+
