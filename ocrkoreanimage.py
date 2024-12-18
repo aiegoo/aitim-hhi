@@ -2,12 +2,27 @@ import cv2
 from paddleocr import PaddleOCR
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
+from tkinter import Tk
+from tkinter.filedialog import askopenfilename
+import os
 
 # Initialize PaddleOCR reader
 ocr = PaddleOCR(use_angle_cls=True, lang='korean')  # Add more languages if needed
 
+# Hide the root Tkinter window
+Tk().withdraw()
+
+# Open file dialog to select the image file
+image_path = askopenfilename(
+    title="Select an image file for OCR",
+    filetypes=[("Image Files", "*.jpg *.png *.jpeg"), ("All Files", "*.*")]
+)
+
+if not image_path:
+    print("No file selected. Exiting.")
+    exit()
+
 # Load the image
-image_path = "KakaoTalk_20241202_170309467.jpg"  # Replace with the path to your image
 frame = cv2.imread(image_path)
 
 if frame is None:
@@ -24,8 +39,13 @@ results = ocr.ocr(frame, cls=True)
 frame_pil = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
 draw = ImageDraw.Draw(frame_pil)
 
-# Prepare to save the recognized text
-output_text_path = "recognized_text.txt"
+# Prepare paths for saving results in context with the input file
+base_name = os.path.splitext(os.path.basename(image_path))[0]
+output_dir = os.path.dirname(image_path)
+output_text_path = os.path.join(output_dir, f"{base_name}_recognized_text.txt")
+output_image_path = os.path.join(output_dir, f"{base_name}_output_image_with_ocr.jpg")
+
+# Save recognized text to a file
 with open(output_text_path, "w", encoding="utf-8") as text_file:
     # Check if OCR detected any text
     if results and results[0]:
@@ -52,8 +72,9 @@ with open(output_text_path, "w", encoding="utf-8") as text_file:
 result_frame = cv2.cvtColor(np.array(frame_pil), cv2.COLOR_RGB2BGR)
 
 # Save the processed image
-output_image_path = "output_image_with_ocr.jpg"  # Define the path to save the result
 cv2.imwrite(output_image_path, result_frame)
+
+# Notify the user
 print(f"Resulting image saved at {output_image_path}")
 print(f"Recognized text saved at {output_text_path}")
 
