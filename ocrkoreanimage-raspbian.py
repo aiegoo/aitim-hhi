@@ -29,7 +29,7 @@ if frame is None:
     raise FileNotFoundError(f"Image at '{image_path}' not found or could not be loaded.")
 
 # Load a font that supports Korean
-font_path = "C:\\Windows\\Fonts\\malgun.ttf" # Adjust to match the actual file name
+font_path = "/usr/share/fonts/truetype/nanum/NanumGothic.ttf"  # Change this to a valid font path on your system
 font = ImageFont.truetype(font_path, 24)
 
 # Perform OCR on the frame
@@ -58,16 +58,11 @@ with open(output_text_path, "w", encoding="utf-8") as text_file:
                 text_file.write(f"{text}\n")
 
                 # Extract coordinates
-                x0, y0 = map(int, bbox[0])
-                x2, y2 = map(int, bbox[2])
-                
-                # Ensure y0 <= y2
-                top_left = (x0, min(y0, y2))
-                bottom_right = (x2, max(y0, y2))
-                
+                top_left = tuple(map(int, bbox[0]))
+                bottom_right = tuple(map(int, bbox[2]))
+
                 # Draw rectangle around detected text
                 draw.rectangle([top_left, bottom_right], outline="green", width=2)
-
 
                 # Display text and confidence score
                 display_text = f"{text} ({confidence:.2f})"
@@ -87,4 +82,3 @@ print(f"Recognized text saved at {output_text_path}")
 cv2.imshow('PaddleOCR Image', result_frame)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
-
