@@ -4,8 +4,22 @@ from torchvision import transforms, models
 from PIL import Image
 import numpy as np
 
-# Define the number of classes (should match your training setup)
-num_classes = 5
+# Function to load class names from labels.txt
+def load_class_names(labels_path):
+    try:
+        with open(labels_path, 'r') as f:
+            class_names = [line.strip() for line in f.readlines()]
+        return class_names
+    except FileNotFoundError:
+        print(f"Error: {labels_path} not found.")
+        exit()
+
+# Path to labels.txt
+labels_path = "tool_dataset/labels.txt"
+class_names = load_class_names(labels_path)
+
+# Define the number of classes (should match the number of labels in labels.txt)
+num_classes = len(class_names)
 
 # Load the model architecture (ResNet18 in this case)
 model = models.resnet18(pretrained=False)  # Set pretrained=False because you're loading your weights
@@ -26,9 +40,6 @@ transform = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
-
-# Define the class names (should match the classes used during training)
-class_names = ['background', 'hammer', 'measuring_tape', 'pliers', 'screwdriver']
 
 # Open a connection to the webcam
 cap = cv2.VideoCapture(0)

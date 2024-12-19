@@ -1,9 +1,16 @@
 import torch
 from torchvision import transforms, models
 from PIL import Image
+import tkinter as tk
+from tkinter import filedialog
+
+# Load class names from labels.txt
+labels_file = "tool_dataset/labels.txt"
+with open(labels_file, "r") as f:
+    class_names = [line.strip() for line in f.readlines()]
 
 # Define the number of classes (should match your training setup)
-num_classes = 5
+num_classes = len(class_names)
 
 # Load the model architecture (ResNet18 in this case)
 model = models.resnet18(pretrained=False)  # Set pretrained=False because you're loading your weights
@@ -25,8 +32,16 @@ transform = transforms.Compose([
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
 
+# Open a file dialog to select the image file
+root = tk.Tk()
+root.withdraw()  # Hide the root window
+image_path = filedialog.askopenfilename(title="Select an Image File", filetypes=[("Image files", "*.jpg;*.jpeg;*.png")])
+
+if not image_path:
+    print("No file selected. Exiting...")
+    exit()
+
 # Load and preprocess the image
-image_path = "image_7.jpg"
 image = Image.open(image_path).convert("RGB")
 image = transform(image).unsqueeze(0).to(device)
 
@@ -34,9 +49,6 @@ image = transform(image).unsqueeze(0).to(device)
 with torch.no_grad():
     outputs = model(image)
     _, preds = torch.max(outputs, 1)
-
-# Define the class names (should match the classes used during training)
-class_names = ['background', 'hammer', 'measuring_tape', 'pliers', 'screwdriver']
 
 # Print the predicted class
 print(f"Predicted class: {class_names[preds.item()]}")
